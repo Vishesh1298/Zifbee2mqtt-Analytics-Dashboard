@@ -7,8 +7,9 @@ REM Wait for a moment
 timeout /nobreak /t 2 >nul
 
 REM Start Node.js server
-cd V:\FYP_Maynooth\FYP_Maynooth\backend_code\
+cd V:\GitHub\Zifbee2mqtt-Analytics-Dashboard\backend_code\
 start "" node server.js
 
 REM Inform the user that Mosquitto and server.js are now running 
 echo Mosquitto and server.js are now running.
+
