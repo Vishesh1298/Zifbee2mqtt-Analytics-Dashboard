@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const pgp = require('pg-promise')();
 const mqtt = require('mqtt');
+const axios = require('axios');
 
 const app = express();
 const port = 3010; // Choose a suitable port
@@ -45,10 +46,28 @@ mqttClient.on('message', async (topic, message) => {
       console.log(`Switch ${device_id} state is set to ${state}`);
       // Insert the state into the switch_logs table
       await db.none('INSERT INTO switch_logs (switch_id, state) VALUES ($1, $2)', [device_id, state]);
+
+      // Update ThingSpeak with On/Off state data
+      const apiKeySwitch = 'WY8GUTDC6GUR9ZS5'; // Replace with your ThingSpeak Write API Key for the switch
+      const fieldNumberSwitch = 2; // Replace with the appropriate field number on your ThingSpeak channel for the switch
+
+      let switchStateNumber = 0; // Assume 'Off' state by default
+      if (state === 'on') {
+        switchStateNumber = 1; // Set to 1 if state is 'On'
+      }
+
+      await axios.post(`https://api.thingspeak.com/update.json?api_key=${apiKeySwitch}&field${fieldNumberSwitch}=${switchStateNumber}`);
+
     } else if (payload.topic.includes('Thermostat')) {
       console.log(`Thermostat ${device_id} temperature is set to ${state} in mode ${mode}`);
       // Insert the state into the thermostat_logs table
       await db.none('INSERT INTO thermostat_logs (thermostat_id, temperature, mode) VALUES ($1, $2, $3)', [device_id, state, mode]);
+
+      // Update ThingSpeak with temperature and timestamp data
+      const apiKey = 'WY8GUTDC6GUR9ZS5'; // Replace with your ThingSpeak Write API Key
+      const fieldNumber = 1; // Replace with the appropriate field number on your ThingSpeak channel
+
+      await axios.post(`https://api.thingspeak.com/update.json?api_key=${apiKey}&field${fieldNumber}=${state}`);
     }
 
     console.log(`Inserted into the database successfully.`);
