@@ -3,6 +3,21 @@ const bodyParser = require('body-parser');
 const pgp = require('pg-promise')();
 const mqtt = require('mqtt');
 const axios = require('axios');
+const winston = require('winston');
+
+// Configure Winston logger
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' })
+  ]
+});
 
 const app = express();
 const port = 3010; // Choose a suitable port
@@ -15,90 +30,68 @@ const db = pgp({
 const mqttClient = mqtt.connect('mqtt://localhost:1883');
 
 mqttClient.on('connect', () => {
-  console.log('Connected to MQTT broker');
-
-  // Subscribe to the topic where simulated devices will publish messages
+  logger.info('Connected to MQTT broker');
   mqttClient.subscribe('zigbee2mqtt');
-
 });
 
 db.one('SELECT $1 AS value', 123)
   .then(data => {
-    console.log('Database connection test successful:', data.value);
+    logger.info('Database connection test successful:', data.value);
   })
   .catch(error => {
-    console.error('Error connecting to the database:', error);
+    logger.error('Error connecting to the database:', error);
   });
 
 mqttClient.on('message', async (topic, message) => {
-  // Handle incoming MQTT messages here
-  console.log(`Received message on topic ${topic}: ${message}`);
-
-  // Extract device_id, state, and mode from the message and handle them as needed
   try {
+    logger.info(`Received message on topic ${topic}: ${message}`);
     const payload = JSON.parse(message);
     const device_id = payload.device_id;
     const state = payload.state;
     const mode = payload.mode;
 
-    // Log the extracted information based on device type
     if (payload.topic.includes('Switch')) {
-      console.log(`Switch ${device_id} state is set to ${state}`);
-      // Insert the state into the switch_logs table
+      logger.info(`Switch ${device_id} state is set to ${state}`);
       await db.none('INSERT INTO switch_logs (switch_id, state) VALUES ($1, $2)', [device_id, state]);
-
-      // Update ThingSpeak with On/Off state data
       const apiKeySwitch = 'WY8GUTDC6GUR9ZS5'; // Replace with your ThingSpeak Write API Key for the switch
-      const fieldNumberSwitch = 2; // Replace with the appropriate field number on your ThingSpeak channel for the switch
-
-      let switchStateNumber = 0; // Assume 'Off' state by default
+      const fieldNumberSwitch = 2;
+      let switchStateNumber = 0;
       if (state === 'on') {
-        switchStateNumber = 1; // Set to 1 if state is 'On'
+        switchStateNumber = 1;
       }
-
       await axios.post(`https://api.thingspeak.com/update.json?api_key=${apiKeySwitch}&field${fieldNumberSwitch}=${switchStateNumber}`);
-
     } else if (payload.topic.includes('Thermostat')) {
-      console.log(`Thermostat ${device_id} temperature is set to ${state} in mode ${mode}`);
-      // Insert the state into the thermostat_logs table
+      logger.info(`Thermostat ${device_id} temperature is set to ${state} in mode ${mode}`);
       await db.none('INSERT INTO thermostat_logs (thermostat_id, temperature, mode) VALUES ($1, $2, $3)', [device_id, state, mode]);
-
-      // Update ThingSpeak with temperature and timestamp data
       const apiKey = 'WY8GUTDC6GUR9ZS5'; // Replace with your ThingSpeak Write API Key
-      const fieldNumber = 1; // Replace with the appropriate field number on your ThingSpeak channel
-
+      const fieldNumber = 1;
       await axios.post(`https://api.thingspeak.com/update.json?api_key=${apiKey}&field${fieldNumber}=${state}`);
     }
 
-    console.log(`Inserted into the database successfully.`);
+    logger.info('Inserted into the database successfully.');
   } catch (error) {
-    console.error('Error handling MQTT message:', error);
+    logger.error('Error handling MQTT message:', error);
   }
 });
 
-// Body parser middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Get all device states from switch_logs and thermostat_logs tables
 app.get('/api/device-states', async (req, res) => {
   try {
     const switchLogs = await db.any('SELECT * FROM switch_logs');
     const thermostatLogs = await db.any('SELECT * FROM thermostat_logs');
-
     const allDeviceStates = {
       switch_logs: switchLogs,
       thermostat_logs: thermostatLogs,
     };
-
     res.json(allDeviceStates);
   } catch (error) {
-    console.error(error);
+    logger.error('Error retrieving device states:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-// Start the server
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  logger.info(`Server is running on port ${port}`);
 });
