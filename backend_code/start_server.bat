@@ -8,7 +8,7 @@ timeout /nobreak /t 2 >nul
 
 REM Start Node.js server
 cd V:\GitHub\Zifbee2mqtt-Analytics-Dashboard\backend_code\
-start "" node server_Test.js
+start "" node server.js
 
 REM Inform the user that Mosquitto and server_Test.js are now running 
 echo Mosquitto and server_Test.js are now running.

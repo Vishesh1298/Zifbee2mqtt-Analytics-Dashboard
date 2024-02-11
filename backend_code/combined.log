@@ -1,0 +1,9 @@
+{"level":"info","message":"Server is running on port 3010","timestamp":"2024-02-10T16:27:29.142Z"}
+{"level":"info","message":"Connected to MQTT broker","timestamp":"2024-02-10T16:27:29.154Z"}
+{"level":"info","message":"Database connection test successful:","timestamp":"2024-02-10T16:27:29.207Z"}
+{"level":"info","message":"Received message on topic zigbee2mqtt: {\"device_id\":\"Switch_test\",\"state\":\"off\",\"topic\":\"zigbee2mqtt/Switch\"}","timestamp":"2024-02-10T16:28:15.128Z"}
+{"level":"info","message":"Switch Switch_test state is set to off","timestamp":"2024-02-10T16:28:15.129Z"}
+{"level":"info","message":"Inserted into the database successfully.","timestamp":"2024-02-10T16:28:15.698Z"}
+{"level":"info","message":"Received message on topic zigbee2mqtt: {\"device_id\":\"Thermostat_test\",\"state\":15.669872981077807,\"mode\":\"heat\",\"topic\":\"zigbee2mqtt/Thermostat\"}","timestamp":"2024-02-10T16:28:21.904Z"}
+{"level":"info","message":"Thermostat Thermostat_test temperature is set to 15.669872981077807 in mode heat","timestamp":"2024-02-10T16:28:21.904Z"}
+{"level":"info","message":"Inserted into the database successfully.","timestamp":"2024-02-10T16:28:22.290Z"}
