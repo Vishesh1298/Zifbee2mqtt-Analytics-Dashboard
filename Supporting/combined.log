@@ -46,3 +46,15 @@
 {"level":"info","message":"Received message on topic zigbee2mqtt: {\"device_id\":\"Thermostat_test\",\"state\":15,\"mode\":\"heat\",\"topic\":\"zigbee2mqtt/Thermostat\"}","timestamp":"2024-02-11T18:43:41.934Z"}
 {"level":"info","message":"Thermostat Thermostat_test temperature is set to 15 in mode heat","timestamp":"2024-02-11T18:43:41.935Z"}
 {"level":"info","message":"Inserted into the database successfully.","timestamp":"2024-02-11T18:43:42.060Z"}
+{"level":"info","message":"Server is running on port 3010","timestamp":"2024-02-19T16:08:30.666Z"}
+{"level":"info","message":"Connected to MQTT broker","timestamp":"2024-02-19T16:08:30.688Z"}
+{"level":"info","message":"Database connection test successful:","timestamp":"2024-02-19T16:08:30.763Z"}
+{"level":"info","message":"Received message on topic zigbee2mqtt: {\"device_id\":\"Thermostat_test\",\"state\":15.669872981077807,\"mode\":\"heat\",\"topic\":\"zigbee2mqtt/Thermostat\"}","timestamp":"2024-02-19T16:09:32.206Z"}
+{"level":"info","message":"Thermostat Thermostat_test temperature is set to 15.669872981077807 in mode heat","timestamp":"2024-02-19T16:09:32.207Z"}
+{"level":"info","message":"Inserted into the database successfully.","timestamp":"2024-02-19T16:09:32.752Z"}
+{"level":"info","message":"Received message on topic zigbee2mqtt: {\"device_id\":\"Switch_test\",\"state\":\"off\",\"topic\":\"zigbee2mqtt/Switch\"}","timestamp":"2024-02-19T16:09:44.301Z"}
+{"level":"info","message":"Switch Switch_test state is set to off","timestamp":"2024-02-19T16:09:44.302Z"}
+{"level":"info","message":"Inserted into the database successfully.","timestamp":"2024-02-19T16:09:44.711Z"}
+{"level":"info","message":"Received message on topic zigbee2mqtt: {\"device_id\":\"Switch_test\",\"state\":\"on\",\"topic\":\"zigbee2mqtt/Switch\"}","timestamp":"2024-02-19T16:11:02.688Z"}
+{"level":"info","message":"Switch Switch_test state is set to on","timestamp":"2024-02-19T16:11:02.689Z"}
+{"level":"info","message":"Inserted into the database successfully.","timestamp":"2024-02-19T16:11:03.160Z"}

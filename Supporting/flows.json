@@ -1,0 +1,195 @@
+[
+    {
+        "id": "6f604f4914f35c77",
+        "type": "tab",
+        "label": "Devices",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "22cca26eb85b22c7",
+        "type": "debug",
+        "z": "6f604f4914f35c77",
+        "name": "Debug_console",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 440,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "6743f58ea9a2a0cc",
+        "type": "mqtt in",
+        "z": "6f604f4914f35c77",
+        "name": "",
+        "topic": "zigbee2mqtt",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "50b5687e0dd8a62b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 130,
+        "y": 780,
+        "wires": [
+            [
+                "22cca26eb85b22c7"
+            ]
+        ]
+    },
+    {
+        "id": "9b8a76f420918628",
+        "type": "mqtt out",
+        "z": "6f604f4914f35c77",
+        "name": "",
+        "topic": "zigbee2mqtt",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "50b5687e0dd8a62b",
+        "x": 390,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "979e74521c595576",
+        "type": "inject",
+        "z": "6f604f4914f35c77",
+        "name": "Switch_test",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "*/30 17-20 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "zigbee2mqtt",
+        "payload": "{\"device_id\":\"Switch_test\",\"state\":\"on\",\"topic\":\"zigbee2mqtt/Switch\"}",
+        "payloadType": "json",
+        "x": 170,
+        "y": 580,
+        "wires": [
+            [
+                "8078f25977a1c1b7"
+            ]
+        ]
+    },
+    {
+        "id": "8078f25977a1c1b7",
+        "type": "function",
+        "z": "6f604f4914f35c77",
+        "name": "stateChange",
+        "func": "// Initialize state if not present in context\nif (context.get(\"state\") === undefined) {\n    context.set(\"state\", \"off\");\n}\n\n// Toggle switch state between \"on\" and \"off\"\nconst currentState = context.get(\"state\");\nmsg.payload = { \"device_id\": msg.payload.device_id, \"state\": currentState, \"topic\": msg.payload.topic  };\ncontext.set(\"state\", currentState === \"on\" ? \"off\" : \"on\");\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 170,
+        "y": 420,
+        "wires": [
+            [
+                "9b8a76f420918628"
+            ]
+        ]
+    },
+    {
+        "id": "c0f9523786592565",
+        "type": "inject",
+        "z": "6f604f4914f35c77",
+        "name": "Thermostat_test",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "1800",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "zigbee2mqtt",
+        "payload": "{\"device_id\":\"Thermostat_test\",\"state\":17,\"mode\":\"heat\",\"topic\":\"zigbee2mqtt/Thermostat\"}",
+        "payloadType": "json",
+        "x": 150,
+        "y": 100,
+        "wires": [
+            [
+                "abae7de04a8005e1"
+            ]
+        ]
+    },
+    {
+        "id": "abae7de04a8005e1",
+        "type": "function",
+        "z": "6f604f4914f35c77",
+        "name": "function 1",
+        "func": "// Extract data from the input message\nconst { device_id, state, mode, topic } = msg.payload;\n\n// Calculate the hour of the day\nconst now = new Date();\nconst hour = now.getHours();\n\n// Calculate temperature based on a sine wave function\nconst amplitude = 5; // Adjust the amplitude as needed\nconst frequency = 2 * Math.PI / 24; // Adjust frequency to match the 24-hour cycle\nconst baseline = 20; // Adjust the baseline temperature as needed\nconst temperature = Math.sin(frequency * hour) * amplitude + baseline;\n\n// Create a new payload with updated temperature\nmsg.payload = {\n    device_id: device_id,\n    state: temperature,\n    mode: mode,\n    topic: topic\n};\n\n// Return the modified message object\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 180,
+        "y": 260,
+        "wires": [
+            [
+                "9b8a76f420918628"
+            ]
+        ]
+    },
+    {
+        "id": "50b5687e0dd8a62b",
+        "type": "mqtt-broker",
+        "name": "MQTT Broker",
+        "broker": "mqtt://localhost",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    }
+]
